@@ -1,0 +1,42 @@
+<main class="page">
+  <header class="page__header">
+    <h1>{{ title }}</h1>
+    <p class="page__subtitle">{{ subtitle }}</p>
+  </header>
+
+  <section class="intro">
+    <p>
+      This UI is part of a multi-repo forum teaching project. The frontend
+      (this app), the backend, and the full-system CI/CD orchestration each
+      live in their own repository. This app is intentionally simple: it talks
+      to the backend over an HTTP API and does not contain any backend logic.
+    </p>
+  </section>
+
+  <section class="card status-card" [attr.data-status]="status()">
+    <h2>Backend status</h2>
+
+    @switch (status()) {
+      @case ('loading') {
+        <p class="status status--loading">Checking backend connectivity…</p>
+      }
+      @case ('online') {
+        <p class="status status--online">Backend is online.</p>
+      }
+      @case ('offline') {
+        <p class="status status--offline">
+          Backend is unavailable. Make sure it is running and that the
+          configured backend URL is correct.
+        </p>
+      }
+    }
+  </section>
+
+  <section class="card posts-placeholder">
+    <h2>Forum posts</h2>
+    <p>
+      Forum posts will appear here in a future iteration, once the backend
+      exposes the posts API and the UI loads it.
+    </p>
+  </section>
+</main>
