@@ -54,8 +54,11 @@ repository:
 
 - The UI communicates with the backend **only through the backend's HTTP API**.
 - Requests and responses are JSON over HTTP.
-- The backend base URL is provided via configuration (see
-  [`.env.example`](.env.example), e.g. `BACKEND_BASE_URL=http://localhost:9000`).
+- The backend base URL is configured in one place
+  ([`src/environments/environment.ts`](src/environments/environment.ts)) and
+  injected through the `BACKEND_BASE_URL` token (see
+  [`src/app/app.config.ts`](src/app/app.config.ts)). `.env.example` only
+  documents the expected configuration; Angular does not read `.env` files.
 - The UI must gracefully handle the full range of API outcomes: loading, empty,
   success, error, and unauthorized. See [`docs/requirements.md`](docs/requirements.md).
 
@@ -84,11 +87,53 @@ To keep the layers clean and the teaching example clear:
 This repository may *later* contain its own frontend CI and a Docker image that
 builds and serves the UI — but never the orchestration of the complete product.
 
+## Generated frontend structure
+
+The app is a standard Angular CLI project (standalone components, no NgModules),
+generated with current-stable Angular and intentionally minimal:
+
+```
+src/
+  main.ts                          # bootstraps the standalone App component
+  index.html, styles.css           # document shell and global styles
+  environments/
+    environment.ts                 # THE place to configure backendBaseUrl
+  app/
+    app.ts / app.html / app.css    # root component: title, status card, posts placeholder
+    app.config.ts                  # providers: HttpClient + BACKEND_BASE_URL token
+    app.spec.ts                    # root component unit test
+    backend.config.ts              # BACKEND_BASE_URL injection token
+    backend-status.service.ts      # backend communication (status check only)
+    backend-status.service.spec.ts # service unit test (success + error paths)
+```
+
+Key conventions:
+
+- **Configuration boundary.** The backend URL lives only in `environment.ts` and
+  reaches the service via the `BACKEND_BASE_URL` token — never hardcoded in
+  component or service method bodies.
+- **Thin service layer.** `BackendStatusService` is the only place that performs
+  HTTP. For now it implements a single connectivity/status check and
+  deliberately does not call protected endpoints (e.g. `/posts`) because there is
+  no auth yet.
+- **Status endpoint is a placeholder.** The status check targets a `/health`
+  path (`BackendStatusService.HEALTH_PATH`) that is **not** a confirmed part of
+  the real backend contract. It is intentionally configurable and is fully
+  mocked in tests, so it can be aligned with the real contract later without
+  touching component code.
+- **Testing.** This repo uses the **Angular CLI's current default unit-test
+  setup**, which is **Vitest** (`@angular/build:unit-test` builder) with `jsdom`.
+  Tests use Angular's official HTTP testing utilities (`provideHttpClientTesting`
+  / `HttpTestingController`) and never contact a real backend. Because the course
+  focus is CI/CD rather than test-runner migration, we keep whatever runner the
+  CLI ships by default and do not switch runners unless explicitly required.
+
 ## Deferred / not yet present
 
-The repository currently contains documentation only. The following are planned
-but intentionally not implemented yet (see [`docs/constraints.md`](docs/constraints.md)):
+The following are planned but intentionally not implemented yet (see
+[`docs/constraints.md`](docs/constraints.md)):
 
-- The Angular application itself.
+- Loading and display of forum posts.
+- Authentication.
 - Frontend CI (GitHub Actions).
-- The UI Docker image.
+- The UI Docker image and any runtime configuration mechanism.

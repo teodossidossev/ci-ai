@@ -1,0 +1,56 @@
+.page {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  font-family: system-ui, sans-serif;
+  line-height: 1.5;
+  color: #1f2933;
+}
+
+.page__header {
+  margin-bottom: 1.5rem;
+}
+
+.page__subtitle {
+  margin: 0.25rem 0 0;
+  color: #52606d;
+  font-size: 1.1rem;
+}
+
+.intro {
+  margin-bottom: 1.5rem;
+}
+
+.card {
+  border: 1px solid #cbd2d9;
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.card h2 {
+  margin-top: 0;
+  font-size: 1.2rem;
+}
+
+.status {
+  margin: 0;
+  font-weight: 600;
+}
+
+.status--loading {
+  color: #627d98;
+}
+
+.status--online {
+  color: #0b7a3b;
+}
+
+.status--offline {
+  color: #b42318;
+}
+
+.posts-placeholder p {
+  margin: 0;
+  color: #52606d;
+}

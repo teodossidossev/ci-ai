@@ -35,23 +35,80 @@ See [`ARCHITECTURE.md`](ARCHITECTURE.md) for the full picture.
 
 ## Current status
 
-This repository is in its **foundation** phase:
-
-- ✅ Documentation and AI-ready scaffolding (this iteration)
-- ⬜ Angular application (not generated yet)
+- ✅ Documentation and AI-ready scaffolding
+- ✅ Angular application skeleton (this iteration): simple page, backend status
+  card, posts placeholder, and a backend status service
 - ⬜ Frontend CI via GitHub Actions (not added yet)
 - ⬜ Docker image for the UI (not added yet)
 
-No Angular project has been generated yet. The current contents are
-intentionally limited to documentation and configuration placeholders.
+The app currently renders a single page and performs a backend connectivity
+check. It does **not** yet load forum posts and has **no** authentication.
+
+## Requirements
+
+- **Node.js** `^20.19 || ^22.12 || >=24` (developed on Node 22). The exact
+  supported range is enforced by Angular 21.
+- **npm** 10+ (this repo uses npm; a `package-lock.json` is committed).
+
+## Getting started
+
+```bash
+# Install dependencies (clean, reproducible install from the lockfile)
+npm ci
+
+# Start the dev server at http://localhost:4200
+npm start
+
+# Lint
+npm run lint
+
+# Run unit tests once (CI mode, no watch)
+npm run test:ci
+
+# Run unit tests in watch mode
+npm test
+
+# Production build (output in dist/)
+npm run build:prod
+```
+
+## Testing
+
+Unit tests use the **Angular CLI's current default unit-test setup**, which is
+**Vitest** (via the `@angular/build:unit-test` builder) with `jsdom`. Tests use
+Angular's official HTTP testing utilities (`provideHttpClientTesting` /
+`HttpTestingController`) and never contact a real backend.
+
+This repo deliberately keeps whatever test runner the Angular CLI ships by
+default. The focus of the course is **CI/CD**, not test-runner migration, so we
+do not swap Vitest for Karma/Jasmine (or vice versa) unless explicitly required.
+
+## Backend URL configuration
+
+The backend base URL is configured in **one clear place**:
+[`src/environments/environment.ts`](src/environments/environment.ts)
+(`backendBaseUrl`, default `http://localhost:9000`).
+
+That value is wired into the app via the `BACKEND_BASE_URL` injection token in
+[`src/app/app.config.ts`](src/app/app.config.ts), so it is never hardcoded
+inside components or service methods and can be overridden in tests.
+
+The status check calls a health path (`/health`) that is an **intentional,
+configurable placeholder** — it is **not** a confirmed part of the real backend
+contract yet. It lives in `BackendStatusService.HEALTH_PATH` so it is easy to
+change once the contract is agreed, and it is fully mocked in unit tests.
+
+> **Note:** This is **build-time** configuration. Angular does **not** read
+> `.env` files automatically. [`.env.example`](.env.example) only *documents*
+> the expected configuration. A **runtime** configuration mechanism (e.g. Docker
+> entrypoint substitution) will be added in a later iteration.
 
 ## What will be added later
 
-- The Angular application shell and forum UI.
-- Backend connectivity / status display.
-- Loading of forum posts.
-- Frontend CI (GitHub Actions).
-- A Docker image for the UI.
+- Loading and display of forum posts (once the backend exposes the API).
+- Authentication (not implemented yet).
+- Frontend CI (**GitHub Actions** — not added yet).
+- A **Docker** image for the UI (not added yet).
 
 These are intentionally deferred. See [`docs/constraints.md`](docs/constraints.md)
 for what is explicitly out of scope right now.
